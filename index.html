@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secret Santa Sender</title>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@30.2.1/dist/ag-grid-community.min.js" integrity="sha256-tI163+ATirC2SqX8l3oWPp6tQgs1lmgsXV94Tyrobk4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" integrity="sha256-uOhwxdKyl3LxDJ+pppPIuJaqyFQO1nAePMYwTGg/69s=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nunjucks@3.2.4/browser/nunjucks.min.js" integrity="sha256-k3aSiLPrY//wLUBAa6TS1J9Itw8xV2zcMw7n9iaFbz8=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style media="only screen">
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        html {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 0;
+            overflow: auto;
+        }
+
+        .ag-theme-alpine {
+            height: 40%;
+            width: 100%;
+            resize: vertical;
+        }
+
+        #body {
+            width:100%;
+            resize: vertical;
+        }
+
+        input {
+            width: auto;
+        }
+
+        body {
+            overflow-y: hidden;
+            display: grid;
+            grid-template-rows: 100% 0%;
+        }
+
+        .button_show {    
+            grid-template-rows: auto 10% !important;
+        }
+
+        #main_container {
+            padding: 1rem;
+            overflow-y: scroll;
+        }
+
+        #sendButton {
+            width: 100%;
+            height: 100%;
+        }
+
+        button {
+            width: 100%;
+        }
+
+        ol {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        h4 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .hiden_warning {
+            display: none;
+        }
+        a:link {
+        color: green;
+        }
+        a:visited {
+        color: red;
+        }
+    </style>
+    <script>
+        const log = console.log.bind(console);
+        const $ = document.getElementById.bind(document);
+    </script>
+    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="louisgeisler" data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF5F5F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+</head>
+<body class=".button_show">
+    <script id="default_csv" type="text/template">
+Name,Email
+Louis,louis@example.com
+Ekaterina,ekaterina@example.com
+Boris,boris@example.com
+Elettra,elettra@example.com
+Ayoub,boris@example.com
+Lina,lina@example.com
+    </script>
+    <form id="main_container">
+        <h1 style="text-align:center; font-size: 3em;">Secret Santa Emailing</h1>
+        <h1 style="text-align:center; font-size: 3em;">🎅📨</h1>
+        
+        <fieldset>
+                <legend><h2>Understand how it works</h2></legend>
+                
+                    <b>🕵️ PRIVACY:</b> No email store! Everything is executed on your computer !
+                    <br><b>🔒 SECURE:</b> No External Email Sender! Your email and your prefered email services (Gmail, Outlook, ...) will be used
+                    <br><b>👍 EASY:</b> Upload a CSV file with at least name and adresses
+                    <br><b>📨 FAST:</b>
+                    <ol>
+                        <li>Upload a CSV file with at least name and adresses</li>
+                        <li>Customize you email template</li>
+                        <li>Verify and send one by one all the prefill email</li>
+                    </ol>
+                    <b>⚙️ ADVANCED:</b> By using Jinja templating, you will be able to <a href="https://jinja.palletsprojects.com/en/3.0.x/templates/#if">define condition in you template</a> !
+                    <br>
+                
+        </fieldset>
+
+        <fieldset>
+            <legend><h2>Upload CSV File with a Name and Email Columns</h2></legend>
+            <input type="file" id="csvFileInput" accept=".csv" onchange="handleFiles(this.files)">
+        </fieldset>
+        <br>
+        <h2 id="people">People Ordering and Sending</h2>
+        <div id="myGrid" class="ag-theme-alpine"></div>
+        <br>
+        <button type="button" id="shuffle"><h2>🔀Shuffle Randomly🔀</h2></button>
+        <br><br>
+        <button type="button" id="download"><h2>Download CSV</h2></button>
+        <fieldset>
+            <legend><h2>Email (<a href="https://jinja.palletsprojects.com/en/3.1.x/templates/" target="_blank">Jinja</a>) Template</h2></legend>
+            <label for="to">To:</label>
+            <input type="text" id="to" name="to" required value="{{ SENDER.EMAIL }}"/>
+            <br>
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required/>
+            <br>
+            <hr width="100%" />
+            <label for="body">Email Template:</label>
+            <br>
+            For each email, you have two people, the email SENDER and the email RECEIVER.<br>
+            From both of them, you can access their personnal information using '.[upper case name of the csv column]'
+            <br>
+            <textarea name="body" id="body" rows="11">
+Hi {{ SENDER.NAME }},
+
+For this Christmas we have plan a Secret Santa !
+
+For this, you'll need to prepare a gift ~10€ for {{ RECEIVER.NAME }} ({{ RECEIVER.EMAIL }}) !
+
+Please, keep the surprise until the End-Of-The-Year Party, the XXth December, in XXXXXX, at XPM.
+
+Be original, creative and see you soon ;-)
+            </textarea>
+        </fieldset>
+        <br>
+        <fieldset>
+            <legend>Select your Email Provider</legend>
+            <input type="radio" id="email_type_1" name="email_type" value="gmail" required/>
+            <label for="email_type_1">GMAIL</label>
+            <br>
+            <input type="radio" id="email_type_2" name="email_type" value="default" required/>
+            <label for="email_type_2">Other</label>
+        </fieldset>
+        <br>
+        <br>
+        <button type="submit" id="generate_emails"><h2>📨 Generate Emails 📨</h2></button>
+        <div id="warning" class="hiden_warning" >
+        <br>
+            <fieldset style="color: red; border-color: red; text-align:center;">
+                <legend >Warning</legend>
+                Popups aren't allowed ; allowed popus, so when you close the opened tab to fill the mail, a new one will automatically open !
+                But you also just keep pressing the "➡️Send Next Email➡️"
+            </fieldset>
+        </div>
+        <br>
+        <fieldset>
+            <legend><h2 id="manual_sending">Manual Sending</h2></legend>
+            <h4>To:</h4>
+            <ol id="urls">
+            </ol>
+        </fieldset>
+
+    </form>
+    <button id="sendButton"><h2>➡️Send Next Email➡️</h2></button>
+    <script>
+
+    $('download').onclick = function () {
+        // Assuming you have an AG-Grid instance
+        const rowData = [];
+        gridOptions.api.forEachNode(node => rowData.push(node.data));
+
+        // Convert Data to CSV Format using PapaParse
+        const csv = Papa.unparse(rowData);
+
+        // Trigger Download of CSV File
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        if (navigator.msSaveBlob) { // For IE 10+
+            navigator.msSaveBlob(blob, "export.csv");
+        } else {
+            const link = document.createElement("a");
+            if (link.download !== undefined) { // For modern browsers
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "export.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    };
+
+        function canOpenPopup() {
+            let testWindow = window.open("", "_blank");
+            if (testWindow) {
+                testWindow.close();
+                console.log("Popups are allowed."); // Popup was allowed
+            } else {
+                console.log("Popups are blocked."); // Popup was blocked
+                alert(
+                    "If you want to be able to send emails more easily, you should allow Popups and then reload the page!"
+                );
+            }
+        }
+        canOpenPopup();
+
+        $("sendButton").onclick = loop_tab;
+
+        const gridOptions = {
+            columnDefs: [],
+            autoSizeStrategy: {
+                type: 'fitGridWidth',
+            },
+            defaultColDef: {
+                flex: 1,
+                sortable: true,
+                filter: true,
+                resizable: false,
+                editable: true,
+                rowDrag: true,
+            },
+            animateRows: true,
+            rowDragManaged: true,
+        };
+
+        // setup the grid after the page has finished loading
+        document.addEventListener('DOMContentLoaded', function () {
+            var gridDiv = document.querySelector('#myGrid');
+            new agGrid.Grid(gridDiv, gridOptions);
+            handleFiles([$("default_csv").innerHTML]);
+            $("subject").value = `Secret Santa ${new Date().getFullYear()+1}`;
+        });
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // swap elements
+            }
+        }
+
+        // Function to shuffle rows in AG-Grid
+        function shuffleGridRows(gridApi) {
+            const rowData = [];
+            gridApi.forEachNode(node => rowData.push(node.data));
+            shuffleArray(rowData);
+            gridApi.setRowData(rowData);
+        }
+
+        document.getElementById('shuffle').addEventListener('click', function() {
+            shuffleGridRows(gridOptions.api);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                var file = files[0];
+
+                Papa.parse(file, {
+                    complete: function(results) {
+                        updateGrid(results.data);
+                    },
+                    header: true,
+                    transformHeader: function(h) {
+                        return h.toUpperCase();
+                    },
+                    worker: false,
+                    skipEmptyLines: 'greedy',
+                });
+            }
+        }
+
+        function updateGrid(data) {
+            if(data.length > 0) {
+
+                // Create an array for column definitions
+                const columnDefs = [
+                    // Adding a dedicated first column for row dragging
+                    { 
+                        headerName: '',
+                        width: 40,
+                        minWidth: 40,
+                        maxWidth: 40,
+                        editable: false,
+                        rowDrag: true,
+                        lockVisible: true, // Prevents hiding the column
+                        suppressMenu: true,
+                        lockPosition: true, // Makes the column fixed in its position
+                        suppressResize: true,
+                        suppressSorting: true,
+                        suppressMovable: true,
+                        suppressSizeToFit: true,
+                    },
+                ];
+
+                // Add other columns based on data keys
+                Object.keys(data[0]).forEach(key => {
+                    columnDefs.push({ field: key });
+                });
+
+                // Set column definitions and row data in grid options
+                gridOptions.api.setColumnDefs(columnDefs);
+                gridOptions.api.setRowData(data);
+            }
+        }
+
+        function enc(txt) {
+            // First, encode the text for URL, which will also encode UTF-8 characters and most special characters
+            let encoded = encodeURIComponent(txt);
+
+            // Replace '+' with '%2B'
+            encoded = encoded.replace(/\+/g, '%2B');
+
+            // Escape single quotes by replacing them with '%27'
+            encoded = encoded.replace(/'/g, '%27');
+
+            // Escape double quotes by replacing them with '%22' (this is optional since encodeURIComponent already does this)
+            encoded = encoded.replace(/"/g, '%22');
+
+            return encoded;
+        }
+
+        function generate_uri(info_dict, mode=false) {
+            switch(mode.toLowerCase()) {
+                case "gmail":
+                    let encoded_url = enc(`mailto:?to=${info_dict.to}&subject=${info_dict.subject}&body=${info_dict.body}`);
+                    return `https://mail.google.com/mail/?extsrc=mailto&url=${encoded_url}`;
+                default:
+                    return `mailto:${info_dict.to}?subject=${info_dict.subject}&body=${info_dict.body}`;
+            };
+        };
+
+        function open_popup(index) {
+
+            let email_type=document.querySelector('input[name="email_type"]:checked').value;
+
+            return window.open(
+                generate_uri(
+                    processed_info[index],
+                    data["email_type"]
+                ),
+                '_blank',
+            );
+        }
+
+        let fbAuthWindow;
+        
+        function loop_tab() {
+
+            let url_elements = $("urls").children;
+
+            if (url_elements.length < i_clicked_link) {
+                alert("📨 You have send all the email ! 📨");
+                i_clicked_link = 0;
+                $('download').onclick();
+                return
+            }
+            
+            fbAuthWindow = url_elements[i_clicked_link].firstChild.onclick();
+            i_clicked_link += 1;
+
+            const checkAuthWindow = () => {
+                if (!fbAuthWindow) {
+                    $("warning").classList.remove("hiden_warning");
+                    window.location.href="#warning";
+                } else if (fbAuthWindow.closed) {
+                    loop_tab();
+                } else {
+                    setTimeout(checkAuthWindow, 500);
+                }
+            };
+            checkAuthWindow();
+        }
+
+        let processed_info;
+        let data;
+        let i_clicked_link;
+        
+        $("main_container").onsubmit = async function(event) {
+
+            i_clicked_link = 0;
+
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Retrieve form data
+            let formData = new FormData(this);
+            data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            let fileds = ["to", "subject", "body"];
+
+            // Get the templates for each filed of the email
+            let info = Object.fromEntries(fileds.map(x => [x, data[x]]));
+
+            // Initialize Template Rendering Engine
+            nunjucks.configure({ autoescape: true });
+
+            const row_data = [];
+            gridOptions.api.forEachNode(node => row_data.push(node.data));
+
+            document.body.classList.add("button_show")
+
+            processed_info = [];
+
+            // Iterate over all data rows
+            for (let i = 0; i < row_data.length; i++) {
+
+                let row_info_dict = {
+                    "SENDER": row_data[i],
+                    "RECEIVER": row_data[(i+1>=row_data.length)?0:i+1],
+                };
+
+                let rendered_email_fields = {}
+
+                Object.keys(info).forEach(key => {
+                    rendered_email_fields[key] = nunjucks.renderString(
+                        info[key],
+                        row_info_dict
+                    );
+                });
+
+                processed_info.push({...rendered_email_fields})
+
+                $("urls").innerHTML += `<li><a href="#" onclick="return open_popup(${i});"> ${rendered_email_fields.to} </a></li>`;
+        
+            }
+
+            window.location.href = "#manual_sending"
+
+            $("sendButton").onclick();
+        };
+
+    </script>
+</body>
+</html>
