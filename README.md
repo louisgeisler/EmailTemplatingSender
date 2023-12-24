@@ -1,23 +1,23 @@
 <h1 style="text-align:center; font-size: 3em;">Secret Santa Email Sender</h1>
 <h1 style="text-align:center; font-size: 3em;">🎅📨</h1>
 
-**🕵️ PRIVACY:** No email store! Everything is executed on your computer !
-**🔒 SECURE:** No External Email Sender! Your email and your prefered email services (Gmail, Outlook, ...) will be used
-**👍 EASY:** Upload a CSV file with at least name and adresses
-**📨 FAST:**
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Upload a CSV file with at least name and adresses
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Customize you email template
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Verify and send one by one all the prefill email
+**🕵️ PRIVACY:** No email store! Everything is executed on your computer !  
+**🔒 SECURE:** No External Email Sender! Your email and your prefered email services (Gmail, Outlook, ...) will be used  
+**👍 EASY:** Upload a CSV file with at least name and adresses  
+**📨 FAST:**  
+1. Upload a CSV file with at least name and adresses
+2. Customize you email template
+3. Verify and send one by one all the prefill email
+
 **⚙️ ADVANCED:** By using Jinja templating, you will be able to <a href="https://jinja.palletsprojects.com/en/3.0.x/templates/#if">define condition in you template</a> !
-<br>
 
 # Web Site
 
-You can use this github hosted website
+You can use this [github hosted website](https://louisgeisler.github.io/EmailTemplatingSender/)
 
 # Notebook
 
-You can use a jupyter notebook
+You can use a [jupyter notebook](https://github.com/louisgeisler/EmailTemplatingSender/blob/main/secret_santa.ipynb)
 
 # Support
 
