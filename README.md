@@ -8,7 +8,7 @@
     <li>Customize your email template.</li>
     <li>Preview and send each email individually with ease.</li>
 </ol>
-<b>🤝 Trustable & Free:</b> Fully Open Source code, but you can <a href="https://www.buymeacoffee.com/louisgeisler">Buy Me a Coffee ☕</a>
+<b>🤝 Trustable & Free:</b> Fully Open Source code.
 <br><b>⚙️ Advanced Customization:</b> Thanks to <a href="https://jinja.palletsprojects.com/en/3.0.x/templates/#if">Jinja templating</a>, you can add conditional logic to your templates for a personalized touch! !
 <br>
 
