@@ -1,15 +1,16 @@
-<h1 style="text-align:center; font-size: 3em;">Secret Santa Email Sender</h1>
-<h1 style="text-align:center; font-size: 3em;">🎅📨</h1>
+<h1 align="center">Secret Santa Email Sender</h1>
+<h1 align="center">🎅📨</h1>
 
-**🕵️ PRIVACY:** No email store! Everything is executed on your computer !  
-**🔒 SECURE:** No External Email Sender! Your email and your prefered email services (Gmail, Outlook, ...) will be used  
-**👍 EASY:** Upload a CSV file with at least name and adresses  
-**📨 FAST:**  
-1. Upload a CSV file with at least name and adresses
-2. Customize you email template
-3. Verify and send one by one all the prefill email
-
-**⚙️ ADVANCED:** By using Jinja templating, you will be able to <a href="https://jinja.palletsprojects.com/en/3.0.x/templates/#if">define condition in you template</a> !
+<b>🕵️ Privacy First:</b> Your data stays with you. The entire process runs locally on your machine - no email storage worries !
+<br><b>🔒 Secure & Reliable::</b> Uses your existing (professionnal) email account. Fully compatible with popular services like Gmail and Outlook.
+<br><b>📨 User-Friendly:</b><ol>
+    <li>Upload a CSV with names and addresses.</li>
+    <li>Customize your email template.</li>
+    <li>Preview and send each email individually with ease.</li>
+</ol>
+<b>🤝 Trustable & Free:</b> Fully Open Source code, but you can <a href="https://www.buymeacoffee.com/louisgeisler">Buy Me a Coffee ☕</a>
+<br><b>⚙️ Advanced Customization:</b> Thanks to <a href="https://jinja.palletsprojects.com/en/3.0.x/templates/#if">Jinja templating</a>, you can add conditional logic to your templates for a personalized touch! !
+<br>
 
 # Web Site
 
